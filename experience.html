@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة بناء - تجربة حفل التخرج 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --secondary: #3b82f6;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-glow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Amiri', sans-serif;
+        }
+
+        body {
+            background: #020617;
+            color: #f8fafc;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #bg-video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.8) 0%, #020617 100%);
+            z-index: -1;
+        }
+
+        .hero-img {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.3;
+            z-index: -2;
+            filter: blur(5px);
+        }
+
+        /* Experience Container */
+        .experience-container {
+            width: 90%;
+            max-width: 1200px;
+            height: 85vh;
+            background: var(--glass);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Sidebar Progress */
+        .progress-sidebar {
+            width: 320px;
+            background: rgba(15, 23, 42, 0.4);
+            border-left: 1px solid var(--glass-border);
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            opacity: 0.4;
+            transition: 0.5s;
+            position: relative;
+        }
+
+        .step-item.active {
+            opacity: 1;
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 0.9rem;
+            border: 1px solid var(--glass-border);
+        }
+
+        .active .step-number {
+            background: var(--secondary);
+            box-shadow: var(--text-glow);
+            border: none;
+        }
+
+        .step-label {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        /* Main Stage */
+        .stage {
+            flex: 1;
+            padding: 4rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step-content {
+            display: none;
+            animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+            height: 100%;
+        }
+
+        .step-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 { font-size: 3rem; font-weight: 900; margin-bottom: 1rem; background: linear-gradient(135deg, #fff 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        p.desc { color: #94a3b8; font-size: 1.1rem; line-height: 1.8; margin-bottom: 3rem; }
+
+        /* Buttons */
+        .btn-premium {
+            padding: 1.5rem 3rem;
+            border-radius: 20px;
+            border: none;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            color: white;
+            font-weight: 900;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+            align-self: flex-start;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: #94a3b8;
+        }
+
+        /* Lab Components */
+        .mock-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 30px;
+            padding: 2.5rem;
+            border: 1px solid var(--glass-border);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .input-alt {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            padding: 1.2rem;
+            border-radius: 15px;
+            color: white;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .pulse-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: hidden;
+            max-height: 400px;
+        }
+
+        .pulse-item {
+            padding: 1.2rem;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.4s ease-out forwards;
+        }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* Mobile Simulation */
+        .mobile-mockup {
+            width: 300px;
+            height: 600px;
+            background: #000;
+            border: 8px solid #334155;
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mobile-screen {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .qr-placeholder {
+            width: 180px;
+            height: 180px;
+            margin: 2rem auto;
+            background: white;
+            padding: 10px;
+            border-radius: 15px;
+        }
+
+        /* Success Layer */
+        #success-layer {
+            position: absolute;
+            inset: 0;
+            background: var(--primary);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+<div id="bg-video-overlay"></div>
+<img src="assets/graduation_hero.png" class="hero-img" alt="Background">
+
+<div class="experience-container">
+    <!-- Sidebar -->
+    <aside class="progress-sidebar">
+        <div style="margin-bottom: 2rem;">
+            <h1 style="font-family: 'Amiri'; font-size: 1.5rem; color: var(--secondary);">بناء - التجربة الحية 🎓</h1>
+            <p style="font-size: 0.75rem; color: #64748b; margin-top: 5px;">محاكاة إدارة تخرج دفعة 2026</p>
+        </div>
+        <div class="step-item active" id="s-nav-1">
+            <div class="step-number">1</div>
+            <div class="step-label">إطلاق الفعالية 🚀</div>
+        </div>
+        <div class="step-item" id="s-nav-2">
+            <div class="step-number">2</div>
+            <div class="step-label">قاعدة البيانات الذكية 👥</div>
+        </div>
+        <div class="step-item" id="s-nav-3">
+            <div class="step-number">3</div>
+            <div class="step-label">مختبر التصميم (AI) 🎨</div>
+        </div>
+        <div class="step-item" id="s-nav-4">
+            <div class="step-number">4</div>
+            <div class="step-label">نبض الإرسال (Pulse) 📱</div>
+        </div>
+        <div class="step-item" id="s-nav-5">
+            <div class="step-number">5</div>
+            <div class="step-label">بوابة الدخول الذكية 🤳</div>
+        </div>
+        <div class="step-item" id="s-nav-6">
+            <div class="step-number">6</div>
+            <div class="step-label">ختام التجربة 📉</div>
+        </div>
+    </aside>
+
+    <!-- Main Stage -->
+    <main class="stage">
+        
+        <!-- Step 1: Landing -->
+        <section class="step-content active" id="step-1">
+            <h2>لنطلق لحظة المجد.. ⚡</h2>
+            <p class="desc">مرحباً بك في تجربة "بناء" المتكاملة. سنقوم الآن بمحاكاة الخطوات الحقيقية لتنظيم حفل التخرج السنوي مدارس الأحساء الأهلية 2026.</p>
+            <div class="mock-card">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                        <label style="font-size: 0.8rem; color: #64748b;">اسم الفعالية</label>
+                        <input type="text" class="input-alt" value="حفل تخرج الدفعة الخامسة (2026)" readonly>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                        <label style="font-size: 0.8rem; color: #64748b;">المكان</label>
+                        <input type="text" class="input-alt" value="قاعة الدرعية الكبرى" readonly>
+                    </div>
+                </div>
+                <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(59, 130, 246, 0.1); border-radius: 20px; border: 1px solid rgba(59, 130, 246, 0.2);">
+                    <p style="font-size: 0.9rem; line-height: 1.6;">✨ تم ضبط الإعدادات المسبقة لتحقيق أقصى درجات الفخامة في العرض الرقمي.</p>
+                </div>
+            </div>
+            <button class="btn-premium" style="margin-top: 3rem;" onclick="nextStep(2)">تأكيد والبدء في إدارة المدعوين ←</button>
+        </section>
+
+        <!-- Step 2: Guest Database -->
+        <section class="step-content" id="step-2">
+            <h2>الربط الذكي للبيانات.. 👤</h2>
+            <p class="desc">المنصة مرتبطة مباشرة بسجلات الطلاب. سنقوم الآن باستيراد 350 خريجاً مع أولياء أمورهم بضغطة واحدة.</p>
+            <div class="mock-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 1.5rem;">
+                    <h3>قائمة الخريجين (المقترحين)</h3>
+                    <span style="background: var(--secondary); padding: 4px 12px; border-radius: 10px; font-size: 0.8rem;">350 خريج مُكتشف</span>
+                </div>
+                <div style="overflow-y: auto; flex: 1; padding-right: 1rem;">
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="padding: 1.2rem; background: rgba(255,255,255,0.02); border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                            <span>🎓 ريان فهد السبيعي</span>
+                            <span style="color: #64748b;">96656xxxx351</span>
+                        </div>
+                        <div style="padding: 1.2rem; background: rgba(255,255,255,0.02); border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                            <span>🎓 محمد خالد التميمي</span>
+                            <span style="color: #64748b;">96656xxxx882</span>
+                        </div>
+                        <div style="padding: 1.2rem; background: rgba(255,255,255,0.02); border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                            <span>🎓 سعيد ناصر القحطاني</span>
+                            <span style="color: #64748b;">96656xxxx441</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-premium" style="margin-top: 3rem;" onclick="nextStep(3)">اعتماد القائمة وتوليد الدعوات ←</button>
+        </section>
+
+        <!-- Step 3: AI Design Lab -->
+        <section class="step-content" id="step-3">
+            <h2>مختبر التصميم (AI).. 🎨</h2>
+            <p class="desc">ذكاء اصطناعي يبتكر لك هوية بصرية فريدة لكل خريج. شاهد كيف تتحول البيانات إلى تحفة فنية.</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; flex: 1;">
+                <div class="mock-card">
+                    <h3>موجه التصميم (AI Prompt)</h3>
+                    <textarea class="input-alt" style="height: 150px; resize: none;" readonly>Generate a premium graduation invitation for Benaa School. Dark blue background, gold calligraphy, elegant geometry, clear QR code area.</textarea>
+                    <div style="display: flex; align-items: center; gap: 10px; color: var(--success);">
+                        <span style="width: 10px; height: 10px; background: var(--success); border-radius: 50%; display: block; box-shadow: 0 0 10px var(--success);"></span>
+                        <span style="font-size: 0.85rem;">الذكاء الاصطناعي جاهز للتوليد..</span>
+                    </div>
+                </div>
+                <div class="mock-card" style="align-items: center; justify-content: center; background: #000;">
+                    <img src="assets/invitation_mockup.png" style="width: 100%; height: 100%; object-fit: contain; border-radius: 20px;" alt="Design Preview">
+                </div>
+            </div>
+            <button class="btn-premium" style="margin-top: 3rem;" onclick="nextStep(4)">اعتماد التصميم وبدء الإرسال (WhatsApp) ←</button>
+        </section>
+
+        <!-- Step 4: WhatsApp Pulse -->
+        <section class="step-content" id="step-4">
+            <h2>نبض الإرسال (Live Pulse).. 📱</h2>
+            <p class="desc">الآن، المنصة تقوم بإرسال آلاف الرسائل الشخصية عبر واتساب. لاحظ السرعة والتقنيات المستخدمة لتجنب الحظر.</p>
+            <div class="mock-card">
+                <div style="margin-bottom: 2rem; display: flex; justify-content: space-between;">
+                    <div class="stat-small"><strong>تم الإرسال:</strong> <span id="sent-count">0</span>/350</div>
+                    <div class="stat-small" style="color: var(--success);"><strong>معدل الوصول:</strong> 99.8%</div>
+                </div>
+                <div class="pulse-stream" id="pulse-stream">
+                    <!-- Dynamic Items -->
+                </div>
+            </div>
+            <button class="btn-premium" style="margin-top: 3rem;" onclick="nextStep(5)">لقد تم الإرسال.. لننتقل للبوابة 🤳</button>
+        </section>
+
+        <!-- Step 5: Gate Control -->
+        <section class="step-content" id="step-5">
+            <h2>بوابة الدخول الذكية.. 🤳</h2>
+            <p class="desc">يوم الحفل! الخريج يبرز تذكرته، والمنصة تتعرف عليه فوراً وتسجل حضوره في لوحة التحكم.</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; flex: 1;">
+                <div class="mock-card" style="background: #000; align-items: center; justify-content: center;">
+                    <div style="width: 100%; height: 100%; border: 4px dashed rgba(255,255,255,0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rem;">
+                         <div style="width: 150px; height: 150px; border: 2px solid var(--secondary); position: relative; animation: scanLine 2s infinite alternate;">
+                            <div style="position: absolute; width: 100%; height: 2px; background: var(--secondary); box-shadow: 0 0 15px var(--secondary);"></div>
+                         </div>
+                         <p style="color: #64748b;">جاري انتظار المسح الضوئي...</p>
+                         <button class="btn-premium" style="padding: 1rem 2rem; font-size: 0.9rem;" onclick="simulateScan()">محاكاة مسح تذكرة 🎟️</button>
+                    </div>
+                </div>
+                <div class="mock-card">
+                    <h3>تغذية البوابة الحية (Live Feed)</h3>
+                    <div id="gate-logs" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="padding: 1rem; color: #64748b; font-size: 0.85rem; text-align: center;">لا يوجد نشاط دخول حالياً</div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-premium" style="margin-top: 3rem;" onclick="nextStep(6)">عرض التقارير الختامية ←</button>
+        </section>
+
+        <!-- Step 6: Final Reports -->
+        <section class="step-content" id="step-6">
+            <h2>ختام التجربة.. 📉</h2>
+            <p class="desc">تم الانتهاء من حفل التخرج بنجاح ساحق. إليك الإحصائيات الختامية التي تساعدك على اتخاذ قرارات أفضل للأعوام القادمة.</p>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+                <div class="mock-card" style="text-align: center;">
+                    <span style="font-size: 3rem; font-weight: 900; color: var(--secondary);">342</span>
+                    <label style="color: #64748b;">إجمالي الحضور</label>
+                </div>
+                <div class="mock-card" style="text-align: center;">
+                    <span style="font-size: 3rem; font-weight: 900; color: var(--success);">98%</span>
+                    <label style="color: #64748b;">نسبة الرضا عن الدخول</label>
+                </div>
+                <div class="mock-card" style="text-align: center;">
+                    <span style="font-size: 3rem; font-weight: 900; color: var(--accent);">0.8s</span>
+                    <label style="color: #64748b;">متوسط وقت التحقق</label>
+                </div>
+            </div>
+            <div class="mock-card" style="margin-top: 2rem;">
+                 <p style="line-height: 1.8; color: #94a3b8;">
+                    لقد رأيت الآن كيف تحول "بناء" عبء تنظيم فعالية ضخمة إلى رحلة رقمية ممتعة وآمنة. الميزات التي جربتها هي مجرد البداية لما يمكن للمنصة تقديمه.
+                 </p>
+                 <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button class="btn-premium" style="background: linear-gradient(135deg, #10b981, #059669);" onclick="location.reload()">إعادة التجربة 🔄</button>
+                    <button class="btn-premium btn-outline" onclick="window.location.href='index.html'">العودة للوحة التحكم الرئيسية 🏚️</button>
+                 </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- Scripts -->
+<script>
+    let currentStep = 1;
+
+    function nextStep(step) {
+        // Update Nav
+        document.querySelectorAll('.step-item').forEach(el => el.classList.remove('active'));
+        document.getElementById(`s-nav-${step}`).classList.add('active');
+
+        // Update Content
+        document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+        document.getElementById(`step-${step}`).classList.add('active');
+
+        currentStep = step;
+
+        // Step Specific Logics
+        if(step === 4) startPulse();
+    }
+
+    // Step 4: WhatsApp Logic
+    function startPulse() {
+        const stream = document.getElementById('pulse-stream');
+        const countEl = document.getElementById('sent-count');
+        let count = 0;
+        const names = ["ريان السبيعي", "محمد التميمي", "سعيد القحطاني", "خالد الحربي", "عبدالله العتيبي", "فهد المقرن", "ياسر الدوسري"];
+        
+        const interval = setInterval(() => {
+            if(count >= 30) { clearInterval(interval); return; }
+            count++;
+            countEl.innerText = count;
+            
+            const name = names[Math.floor(Math.random() * names.length)];
+            const item = document.createElement('div');
+            item.className = 'pulse-item';
+            item.innerHTML = `<span>📱 إرسال إلى: <strong>${name}</strong></span> <span style="font-size:0.7rem;">تم بنجاح ✔️</span>`;
+            stream.prepend(item);
+            
+            if(stream.children.length > 5) stream.lastElementChild.remove();
+        }, 300);
+    }
+
+    // Step 5: Scan Simulation
+    function simulateScan() {
+        const logs = document.getElementById('gate-logs');
+        const names = ["ريان فهد السبيعي", "محمد بن خالد", "سعيد ناصر"];
+        const name = names[Math.floor(Math.random() * names.length)];
+        
+        if(logs.innerText.includes('لا يوجد')) logs.innerHTML = "";
+        
+        const log = document.createElement('div');
+        log.style = "padding: 0.8rem; background: rgba(16, 185, 129, 0.1); border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2); display: flex; justify-content: space-between; font-size: 0.9rem;";
+        log.innerHTML = `<span>✅ دخول: <strong>${name}</strong></span> <small style="color: #64748b;">قبل قليل</small>`;
+        
+        logs.prepend(log);
+        if(logs.children.length > 4) logs.lastElementChild.remove();
+        
+        // Show a brief success alert in premium way
+        const toast = document.createElement('div');
+        toast.style = "position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); background: var(--success); padding: 1rem 2rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3); font-weight: 900; z-index: 1000; animation: bounceIn 0.5s;";
+        toast.innerText = `تم التعرف على: ${name} 🎓`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+</script>
+
+<style>
+    @keyframes scanLine { from { opacity: 0.1; } to { opacity: 1; } }
+    @keyframes bounceIn { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+</style>
+
+</body>
+</html>
