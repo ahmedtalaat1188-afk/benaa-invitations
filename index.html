@@ -987,6 +987,26 @@
         }, 400);
     }
 
+    function showTab(tabId, el) {
+        // Hide all sections
+        document.querySelectorAll('main section').forEach(sec => sec.classList.add('hidden'));
+        // Show target section
+        const target = document.getElementById(`tab-${tabId}`);
+        if(target) target.classList.remove('hidden');
+        
+        // Update nav-links
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        if(el) el.classList.add('active');
+        
+        // Auto-close sidebar on mobile
+        if(window.innerWidth <= 768) {
+            document.querySelector('.sidebar').classList.remove('open');
+            document.getElementById('mobile-toggle').innerText = '☰';
+        }
+        
+        if(tabId === 'reports') refreshReports();
+    }
+
     function toggleMobileSidebar() {
         const sb = document.querySelector('.sidebar');
         sb.classList.toggle('open');
