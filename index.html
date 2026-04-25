@@ -191,11 +191,11 @@
         <div style="text-align: inherit; margin-bottom: 2.5rem;">
             <div style="margin-bottom: 1.5rem;">
                 <label data-i18n="email_label" style="color: #94a3b8; font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.8rem; text-align: right;">البريد الإلكتروني</label>
-                <input type="text" id="login-user" class="input-alt" style="width: 100%;" placeholder="example@hns.edu.sa">
+                <input type="text" id="login-user" class="input-alt" style="width: 100%;" placeholder="example@hns.edu.sa" onkeydown="if(event.key==='Enter') attemptLogin()">
             </div>
             <div>
                 <label data-i18n="password_label" style="color: #94a3b8; font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.8rem; text-align: right;">كلمة المرور</label>
-                <input type="password" id="login-pass" class="input-alt" style="width: 100%;" placeholder="••••••••">
+                <input type="password" id="login-pass" class="input-alt" style="width: 100%;" placeholder="••••••••" onkeydown="if(event.key==='Enter') attemptLogin()">
             </div>
         </div>
         <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 1.3rem; font-size: 1.2rem; border-radius: 18px;" id="login-btn-action" onclick="attemptLogin()"><span data-i18n="login_btn">دخول آمن 🛡️</span></button>
@@ -266,24 +266,21 @@
             <div class="nav-link" id="nav-scan" onclick="showTab('scanner', this)"><span>🤳</span> <span data-i18n="tab_scanner">الماسح الضوئي</span></div>
             <div class="nav-link" id="nav-reports" onclick="showTab('reports', this)"><span>📉</span> <span data-i18n="tab_reports">التقارير</span></div>
         </nav>
-        <button class="btn btn-outline" style="margin-top: auto; width: 100%; border-color:#ef4444; color:#ef4444;" onclick="location.reload()" data-i18n="logout_btn">تسجيل الخروج</button>
+        <button class="btn btn-outline" style="margin-top: auto; width: 100%; border-color:#ef4444; color:#ef4444;" onclick="logout()" data-i18n="logout_btn">تسجيل الخروج</button>
     </aside>
 
     <main class="main-content">
         <section id="tab-dashboard" class="fade-in">
             <h1 data-i18n="dash_overview" style="font-size: 2.5rem; margin-bottom: 2.5rem; font-weight: 900;">نظرة شاملة 👋</h1>
             <div class="stat-grid">
-                <div class="stat-card"><span>14</span><label data-i18n="stat_active">فعالية نشطة</label></div>
-                <div class="stat-card"><span>350</span><label data-i18n="stat_attendance">إجمالي الحضور</label></div>
-                <div class="stat-card"><span style="color:#f59e0b;">12</span><label data-i18n="stat_declines">اعتذارات</label></div>
+                <div class="stat-card"><span id="dash-stat-events">0</span><label data-i18n="stat_active">فعالية نشطة</label></div>
+                <div class="stat-card"><span id="dash-stat-attended">0</span><label data-i18n="stat_attendance">إجمالي الحضور</label></div>
+                <div class="stat-card"><span id="dash-stat-declined" style="color:#f59e0b;">0</span><label data-i18n="stat_declines">اعتذارات</label></div>
             </div>
             <div class="glass-view">
                 <h3 data-i18n="dash_live" style="margin-bottom: 1.5rem;">أحدث حركات البوابات (Live) 📡</h3>
                 <div id="live-activity-list" style="display: flex; flex-direction: column; gap: 1rem;">
-                    <div style="padding: 1rem; background: #f0fdf4; border-radius: 15px; display: flex; justify-content: space-between; align-items: center;">
-                        <span>✅ <span data-i18n="scanned_msg">تم مسح تذكرة:</span> <strong>سعيد القحطاني</strong></span>
-                        <small style="color: #64748b;">منذ دقيقتين</small>
-                    </div>
+                    <div id="no-activity-msg" style="padding: 1rem; color: #64748b; text-align: center;">لا يوجد نشاط مسجل حالياً.</div>
                 </div>
             </div>
         </section>
@@ -293,12 +290,9 @@
                 <h1 data-i18n="events_title" style="font-weight: 900;">🗓️ إدارة الفعاليات</h1>
                 <button class="btn btn-primary" onclick="createNewEvent()" data-i18n="btn_add_event">➕ فعالية جديدة</button>
             </div>
-            <div class="glass-view" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-right: 10px solid var(--secondary);">
-                <div>
-                    <h3 style="font-size: 1.5rem; font-weight: 900;">🎓 حفل تخرج الثانوي 2026</h3>
-                    <p style="color: #64748b; margin-top: 5px;">📅 22 مايو | 📍 القاعة الكبرى | 👥 120 مدعو</p>
-                </div>
-                <button class="btn btn-primary" onclick="openGuestList()" data-i18n="manage_guests">إدارة المدعوين →</button>
+            <div id="tab-events-list">
+                <!-- Events will be loaded here dynamically from API -->
+                <p style="text-align: center; color: #64748b; padding: 2rem;">⏳ جاري تحميل الفعاليات...</p>
             </div>
         </section>
 
@@ -308,7 +302,7 @@
                 <div style="display: flex; gap: 12px;">
                      <button class="btn btn-outline" onclick="downloadTemplate('students')" data-i18n="btn_export">📄 تصدير القالب</button>
                      <button class="btn btn-primary" onclick="triggerImport('students')" data-i18n="btn_import">📊 استيراد السجلات</button>
-                     <input type="file" id="file-students" class="hidden" onchange="simulateExcelImport('students')">
+                     <input type="file" id="file-students" class="hidden" onchange="processExcelImport('students')">
                 </div>
             </div>
 
@@ -317,8 +311,6 @@
                 <label data-i18n="active_event_label" style="font-weight: 900; color: var(--primary); white-space: nowrap;">📌 الفعالية النشطة حالياً:</label>
                 <select id="active-event-selector" style="flex: 1; padding: 1rem; border-radius: 12px; border: 2px solid #f1f5f9; background: #f8fafc; font-weight: 700; cursor: pointer;">
                     <option value="" data-i18n="select_event_placeholder">-- يرجى اختيار الفعالية المستهدفة لإضافة المدعوين --</option>
-                    <option value="حفل تخرج الثانوي 2026">🎓 حفل تخرج الثانوي 2026</option>
-                    <option value="تكريم المتفوقين">🏆 تكريم المتفوقين</option>
                 </select>
                 <span class="badge badge-info" style="padding: 1rem 1.5rem; font-size: 0.85rem;" data-i18n="select_event_hint">اختر الفعالية أولاً لربط المدعوين بها</span>
             </div>
@@ -326,9 +318,9 @@
             <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
                 <!-- Internal Tabs for Records -->
                 <div style="background: #f1f5f9; padding: 6px; border-radius: 12px; display: inline-flex; gap: 6px;">
-                    <button id="btn-rec-students" class="btn btn-primary" style="padding: 0.7rem 2rem; border-radius: 8px;" onclick="switchRecordTab('students')" data-i18n="btn_tab_students">🎓 الطلاب (25)</button>
-                    <button id="btn-rec-parents" class="btn btn-outline" style="padding: 0.7rem 2rem; border-radius: 8px; border: none;" onclick="switchRecordTab('parents')" data-i18n="btn_tab_parents">👨‍👩‍👧 أولياء الأمور (22)</button>
-                    <button id="btn-rec-external" class="btn btn-outline" style="padding: 0.7rem 2rem; border-radius: 8px; border: none;" onclick="switchRecordTab('external')" data-i18n="btn_tab_external">🤝 خارجيون (5)</button>
+                    <button id="btn-rec-students" class="btn btn-primary" style="padding: 0.7rem 2rem; border-radius: 8px;" onclick="switchRecordTab('students')" data-i18n="btn_tab_students">🎓 الطلاب</button>
+                    <button id="btn-rec-parents" class="btn btn-outline" style="padding: 0.7rem 2rem; border-radius: 8px; border: none;" onclick="switchRecordTab('parents')" data-i18n="btn_tab_parents">👨‍👩‍👧 أولياء الأمور</button>
+                    <button id="btn-rec-external" class="btn btn-outline" style="padding: 0.7rem 2rem; border-radius: 8px; border: none;" onclick="switchRecordTab('external')" data-i18n="btn_tab_external">🤝 خارجيون</button>
                 </div>
                 <!-- Bulk Add Button for Records -->
                 <button id="btn-bulk-add-rec" class="btn btn-primary" style="background: #1e293b; display: none;" onclick="addSelectedToGuests()">➕ <span data-i18n="col_add">إضافة</span> (<span id="bulk-rec-count">0</span>)</button>
@@ -621,7 +613,7 @@
     const PROD_API_URL = "https://eventbenaa.runasp.net/api"; 
     const API_BASE = PROD_API_URL; 
     
-    const TEST_PHONE = "966563048351"; 
+    const TEST_PHONE = ""; // Remove default test phone
     
     // Auth Helper
     async function fetchWithAuth(url, options = {}) {
@@ -933,7 +925,8 @@
                 if (res.ok) {
                     const data = await res.json();
                     localStorage.setItem('token', data.token);
-                    currentUserRole = data.role.toLowerCase();
+                    localStorage.setItem('role', (data.role || 'admin').toLowerCase());
+                    currentUserRole = (data.role || 'admin').toLowerCase();
                     finishLogin();
                 } else {
                     alert('❌ بيانات الدخول غير صحيحة');
@@ -1005,6 +998,26 @@
         }
         
         if(tabId === 'reports') refreshReports();
+        if(tabId === 'dashboard' && USE_API) updateDashboardStats();
+        if(tabId === 'events') loadEvents();
+    }
+
+    async function updateDashboardStats() {
+        try {
+            const res = await fetchWithAuth(`${API_BASE}/System/dashboard-stats`);
+            if (!res.ok) return;
+            const data = await res.json();
+            
+            const e1 = document.getElementById('dash-stat-events');
+            const e2 = document.getElementById('dash-stat-attended');
+            const e3 = document.getElementById('dash-stat-declined');
+            
+            if(e1) e1.innerText = data.eventsCount;
+            if(e2) e2.innerText = data.attendanceCount;
+            if(e3) e3.innerText = data.declinedCount;
+        } catch (err) {
+            console.error("Dashboard stats error:", err);
+        }
     }
 
     function toggleMobileSidebar() {
@@ -1028,14 +1041,15 @@
         try {
             const res = await fetchWithAuth(`${API_BASE}/Events`);
             const events = await res.json();
-            const container = document.getElementById('tab-events');
-            container.innerHTML = `<h1 data-i18n="tab_events" style="font-weight: 900; margin-bottom: 2rem;">👑 إدارة فعاليات المدارس</h1>
-            <div style="margin-bottom: 2rem; display: flex; gap: 15px;">
-                <button class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1rem; border-radius: 15px;" onclick="createNewEvent()">✨ إنشاء فعالية جديدة</button>
-            </div>`;
+            const container = document.getElementById('tab-events-list');
+            container.innerHTML = "";
             
             const selector = document.getElementById('active-event-selector');
             selector.innerHTML = `<option value="" disabled selected>-- اختر الفعالية النشطة --</option>`;
+
+            if (events.length === 0) {
+                container.innerHTML = `<div class="glass-view" style="text-align:center; padding: 3rem; color: #64748b;">لا توجد فعاليات مسجلة حالياً. قم بإنشاء فعالية جديدة للبدء.</div>`;
+            }
 
             events.forEach(ev => {
                 const div = document.createElement('div');
@@ -1058,6 +1072,9 @@
                 opt.innerText = "👑 " + ev.title;
                 selector.appendChild(opt);
             });
+            
+            // Update Dashboard Stats while we're at it
+            document.getElementById('dash-stat-events').innerText = events.length;
         } catch (err) {
             console.error(err);
             showToast("فشل تحميل الفعاليات", "error");
@@ -1153,51 +1170,33 @@
                     showToast("✅ تم إنشاء الفعالية بنجاح");
                     document.getElementById('modal-create-event').style.display = 'none';
                     loadEvents();
+                    
+                    // Reset fields
+                    document.getElementById('ev-name').value = "";
+                    document.getElementById('ev-date').value = "";
+                    document.getElementById('ev-time').value = "";
+                    document.getElementById('ev-loc').value = "";
                 }
             } catch (err) {
                 showToast("خطأ في حفظ الفعالية", "error");
             }
             return;
         }
-
-        const container = document.getElementById('tab-events');
-        const div = document.createElement('div');
-        div.className = "glass-view fade-in";
-        div.style = "display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-right: 10px solid #8b5cf6;";
-        
-        // Dynamic formatting
-        const formattedDate = new Date(date).toLocaleDateString('ar-SA', { day: 'numeric', month: 'long' });
-        
-        div.innerHTML = `
-            <div>
-                <h3 style="font-size: 1.5rem; font-weight: 900;">👑 ${name}</h3>
-                <p style="color: #64748b; margin-top: 5px;">📅 ${formattedDate} (${time || '--:--'}) | 📍 ${loc} | 👥 0 مدعو</p>
-            </div>
-            <button class="btn btn-primary" onclick="openGuestList('${name}')">إدارة المدعوين →</button>
-        `;
-        
-        container.appendChild(div);
-        
-        // SYNC SELECTOR
-        const sel = document.getElementById('active-event-selector');
-        const opt = document.createElement('option');
-        opt.value = name; opt.innerText = "👑 " + name;
-        sel.appendChild(opt);
-
-        document.getElementById('modal-create-event').style.display = 'none';
-        alert(`✅ تم إنشاء فعاليتك "${name}" وجدولتها بنجاح!`);
-        
-        // Reset fields
-        document.getElementById('ev-name').value = "";
-        document.getElementById('ev-loc').value = "";
     }
 
-    function simulateExcelImport(type) {
+    async function processExcelImport(type) {
         const fileInput = document.getElementById(`file-${type}`);
         if (!fileInput.files || !fileInput.files[0]) return;
+        
+        const evId = document.getElementById('active-event-selector').value;
+        if(type === 'guests' && !evId) {
+            alert("⚠️ يرجى اختيار الفعالية المستهدفة أولاً لإضافة المدعوين إليها.");
+            fileInput.value = "";
+            return;
+        }
 
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
             const text = e.target.result;
             const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
             const dataRows = lines.slice(1); 
@@ -1208,40 +1207,54 @@
             const pct = document.getElementById(`prog-pct-${prefix}`);
             
             container.style.display = 'block';
-            let prog = 0;
-            const inv = setInterval(() => {
-                prog += 25;
-                if(prog >= 100) {
-                    prog = 100; clearInterval(inv);
+            bar.style.width = '10%';
+            pct.innerText = '10%';
+
+            try {
+                const parsedData = dataRows.map(row => {
+                    const cols = row.split(/[,،;]/).map(c => c.trim().replace(/^["']|["']$/g, ''));
+                    if (type === 'guests') {
+                        return { name: cols[0], phone: cols[1], status: 0 };
+                    } else {
+                        return { name: cols[0], phone: cols[2], grade: cols[3], section: cols[4] || 'طالب' };
+                    }
+                }).filter(o => o.name && o.phone);
+
+                if (parsedData.length === 0) throw new Error("لا توجد بيانات صالحة في الملف.");
+
+                bar.style.width = '40%';
+                pct.innerText = '40%';
+
+                const endpoint = type === 'guests' ? `${API_BASE}/Events/${evId}/add-guests` : `${API_BASE}/Students/bulk`;
+                const res = await fetchWithAuth(endpoint, {
+                    method: 'POST',
+                    body: JSON.stringify(parsedData)
+                });
+
+                if (res.ok) {
+                    bar.style.width = '100%';
+                    pct.innerText = '100%';
                     setTimeout(() => {
-                        dataRows.forEach(row => {
-                            const cols = row.split(/[,،;]/).map(c => c.trim().replace(/^["']|["']$/g, ''));
-                            if(cols.length >= 2) appendRealRow(type, cols);
-                        });
-                        alert(`✅ تم استيراد (${dataRows.length}) سجلات بنجاح!`);
+                        showToast(`✅ تم استيراد (${parsedData.length}) سجلات بنجاح!`);
                         container.style.display = 'none';
                         fileInput.value = "";
+                        if(type === 'guests') openGuestList(null, evId); // Refresh guest list if open
+                        else switchRecordTab('students'); // Refresh students tab
                     }, 500);
+                } else {
+                    const err = await res.json();
+                    throw new Error(err.message || "فشل الرفع للسيرفر");
                 }
-                bar.style.width = prog + '%';
-                pct.innerText = prog + '%';
-            }, 100);
+            } catch (err) {
+                alert("❌ خطأ في الاستيراد: " + err.message);
+                container.style.display = 'none';
+                fileInput.value = "";
+            }
         };
         reader.readAsText(fileInput.files[0], 'UTF-8');
     }
 
-    const SAMPLE_RECORDS = [
-        { name: "ريان فهد العلي", rel: "طالب", phone: "966563048351", detail: "الثاني الثانوي" },
-        { name: "محمد خالد التميمي", rel: "طالب", phone: "966563048351", detail: "الثالث المتوسط" },
-        { name: "فهد راشد العلي", rel: "ولي أمر", phone: "966563048351", detail: "والد الطالب ريان" },
-        { name: "خالد بن صالح التميمي", rel: "ولي أمر", phone: "966563048351", detail: "والد الطالب محمد" },
-        { name: "أ. عبدالعزيز بن سعد", rel: "مدعو خارجي", phone: "966563048351", detail: "مشرف تربوي" },
-        { name: "سعيد بن ناصر القحطاني", rel: "ولي أمر", phone: "966563048351", detail: "والد الطالب فهد" },
-        { name: "د. إبراهيم الفوزان", rel: "مدعو خارجي", phone: "966563048351", detail: "ضيف شرف" },
-        { name: "عبدالله بن فهد السبيعي", rel: "طالب", phone: "966563048351", detail: "الأول الثانوي" },
-        { name: "يوسف بن محمد الحربي", rel: "ولي أمر", phone: "966563048351", detail: "والد الطالب فيصل" },
-        { name: "منيرة بنت أحمد", rel: "ولي أمر", phone: "966563048351", detail: "والدة الطالبة ريم" }
-    ];
+    const SAMPLE_RECORDS = []; // Clear dummy records
 
     function initRecords() {
         switchRecordTab('students');
@@ -1697,18 +1710,25 @@
         const savedLang = localStorage.getItem('benaa-lang') || 'ar';
         setLanguage(savedLang);
 
-        if (!USE_API) {
+        if (USE_API) {
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('role');
+            if (token && role) {
+                currentUserRole = role;
+                finishLogin();
+            }
+        } else {
             initRecords();
             // Load some initial guests for simulation only
             appendRealRow('guests', ['سعيد القحطاني', '966563048351', 'بانتظار الرد']);
             appendRealRow('guests', ['ريم العتيبي', '966563048351', 'بانتظار الرد']);
-        } else {
-            // Check if already logged in (token exists)
-            if (localStorage.getItem('token')) {
-                // We're on the login screen by default, but we could auto-login here if role was saved
-                // For now, require login even if token exists to ensure fresh session
-            }
         }
+    }
+
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        location.reload();
     }
 
     function openGuestPageSim() {
@@ -1727,13 +1747,12 @@
     async function saveGuestTicket() {
         try {
             const target = document.getElementById('guest-ticket-printable');
+            const btn = event.currentTarget || document.querySelector('[onclick="saveGuestTicket()"]');
             if (!target) return;
-            showToast(currentLang === 'ar' ? "⏳ جاري تحضير التذكرة..." : "⏳ Preparing ticket...");
             
-            // Fix for local file protocol (CORS limitation)
-            if(window.location.protocol === 'file:') {
-                console.warn("Save as Image might be limited on file:// protocol due to canvas tainting.");
-            }
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = currentLang === 'ar' ? "⏳ جاري التحضير..." : "⏳ Saving...";
 
             const canvas = await html2canvas(target, { 
                 scale: 3, 
@@ -1748,13 +1767,16 @@
             link.download = `Benaa_Ticket_${guestName}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
+            
             showToast(currentLang === 'ar' ? "✅ تم حفظ التذكرة بنجاح!" : "✅ Ticket saved successfully!");
+            btn.disabled = false;
+            btn.innerHTML = originalText;
         } catch (err) {
             console.error(err);
             const msg = currentLang === 'ar' ? 
                 "⚠️ المتصفح يمنع الحفظ التلقائي في هذا الوضع، يرجى تصوير الشاشة (Screenshot) لحفظ التذكرة." :
                 "⚠️ Browser security prevents auto-save in this mode. Please take a Screenshot to save your ticket.";
-            alert(msg);
+            showToast(msg, "error");
         }
     }
 

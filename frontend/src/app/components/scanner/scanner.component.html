@@ -1,0 +1,41 @@
+<div class="scanner-container" style="min-height: 100vh; background: #0f172a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1.5rem; position: relative; overflow: hidden;">
+  
+  <!-- Top Progress Bar -->
+  <header style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 12px; margin-bottom: 2rem;">
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <div style="width: 12px; height: 12px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></div>
+      <span style="font-weight: 600;">نظام البوابات الذكي</span>
+    </div>
+    <div style="text-align: left;">
+      <div style="font-size: 0.8rem; color: #94a3b8;">إحصائيات الحضور</div>
+      <div style="font-size: 1.2rem; font-weight: 700; color: #10b981;">42 / 120</div>
+    </div>
+  </header>
+
+  <!-- Camera Viewport with Scanner Animation -->
+  <div class="viewport glass-card" style="width: 100%; max-width: 400px; aspect-ratio: 1/1; position: relative; padding: 0.5rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 32px; overflow: hidden;">
+    <!-- Mock Camera Stream Backdrop -->
+    <div style="position: absolute; inset: 0; background: #1e293b; display: flex; align-items: center; justify-content: center;">
+      <i style="font-size: 4rem; color: #334155;">📷 جاري تشغيل الكاميرا...</i>
+        <div style="font-weight: 600;">قسم (أ)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Bar -->
+  <footer style="width: 100%; margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem;">
+    <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 1.2rem; font-size: 1.1rem; border-radius: 20px;">بدء المسح المستمر</button>
+    <button class="btn" style="width: 100%; justify-content: center; background: rgba(255,255,255,0.1); color: #94a3b8;">إدخال الكود يدوياً</button>
+  </footer>
+
+  <style>
+    @keyframes scanLine {
+      0% { top: 0; }
+      100% { top: 100%; }
+    }
+    @keyframes pulseSuccess {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</div>

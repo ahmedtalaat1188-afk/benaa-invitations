@@ -1,0 +1,19 @@
+{
+  "name": "benaa-invitation-platform",
+  "version": "1.0.0",
+  "description": "Benaa Event Invitation and Management Platform",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -p 8080",
+    "dev": "npx http-server -p 8080 -c-1",
+    "experience": "npx http-server -p 8080 -c-1 --o experience.html"
+  },
+  "keywords": [
+    "invitation",
+    "event",
+    "qr-code",
+    "management"
+  ],
+  "author": "Antigravity",
+  "license": "MIT"
+}
