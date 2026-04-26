@@ -24,9 +24,11 @@ namespace BenaaInvitations.API.Models
         
         public string? Section { get; set; } // القسم التعليمي
         
-        public string? AcademicYear { get; set; } // سنة الالتحاق
+        public string? AcademicYear { get; set; } 
         
-        // Multi-tenancy
+        // Property for simple frontend mapping
+        public string? Name { get; set; }
+
         [Required]
         public int SchoolId { get; set; }
         public virtual School? School { get; set; }

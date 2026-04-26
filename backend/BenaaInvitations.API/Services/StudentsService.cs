@@ -56,6 +56,12 @@ namespace BenaaInvitations.API.Services
 
         public async Task AddStudentsAsync(List<Student> students)
         {
+            // Set default schoolId if not present (simplified for this QC pass)
+            foreach(var s in students) {
+                if(s.SchoolId == 0) s.SchoolId = 1; 
+                if(string.IsNullOrEmpty(s.NameAr) && !string.IsNullOrEmpty(s.Name)) s.NameAr = s.Name;
+                if(string.IsNullOrEmpty(s.NationalId)) s.NationalId = Guid.NewGuid().ToString("N");
+            }
             _context.Students.AddRange(students);
             await _context.SaveChangesAsync();
         }
