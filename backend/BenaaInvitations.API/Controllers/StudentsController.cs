@@ -42,5 +42,19 @@ namespace BenaaInvitations.API.Controllers
             await _studentsService.AddStudentsAsync(students);
             return Ok(new { message = $"{students.Count} records added successfully." });
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateStudent(string id, Student student)
+        {
+            await _studentsService.UpdateStudentAsync(id, student);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteStudent(string id)
+        {
+            await _studentsService.DeleteStudentAsync(id);
+            return NoContent();
+        }
     }
 }

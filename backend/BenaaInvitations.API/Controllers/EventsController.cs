@@ -49,15 +49,69 @@ namespace BenaaInvitations.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Event>> CreateEvent(Event @event)
+        public async Task<ActionResult<Event>> CreateEvent(EventDto dto)
         {
             if (_tenantService.SchoolId == null) return BadRequest("School context missing.");
 
-            @event.SchoolId = _tenantService.SchoolId.Value;
+            var @event = new Event {
+                SchoolId = _tenantService.SchoolId.Value,
+                Title = dto.Title,
+                Date = dto.Date,
+                Time = dto.Time,
+                LocationLabel = dto.LocationLabel,
+
+                Subtitle = dto.Subtitle,
+                Location = dto.Location,
+                LocationUrl = dto.LocationUrl,
+                Description = dto.Description,
+                LogoUrl = dto.LogoUrl,
+                ThemeColor = dto.ThemeColor,
+                AttachmentUrl = dto.AttachmentUrl,
+                CustomTemplatePath = dto.CustomTemplatePath,
+                NameX = dto.NameX,
+                NameY = dto.NameY,
+                EventDate = DateTime.UtcNow // Set default
+            };
+
             _context.Events.Add(@event);
             await _context.SaveChangesAsync();
             
             return CreatedAtAction(nameof(GetEvent), new { id = @event.Id }, @event);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateEvent(int id, EventDto dto)
+        {
+            var @event = await _context.Events.FindAsync(id);
+            if (@event == null) return NotFound();
+
+            @event.Title = dto.Title;
+            @event.Date = dto.Date;
+            @event.Time = dto.Time;
+            @event.LocationLabel = dto.LocationLabel;
+            @event.Subtitle = dto.Subtitle;
+            @event.Location = dto.Location;
+            @event.LocationUrl = dto.LocationUrl;
+            @event.Description = dto.Description;
+            @event.LogoUrl = dto.LogoUrl;
+            @event.ThemeColor = dto.ThemeColor;
+            @event.AttachmentUrl = dto.AttachmentUrl;
+            @event.CustomTemplatePath = dto.CustomTemplatePath;
+            @event.NameX = dto.NameX;
+            @event.NameY = dto.NameY;
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEvent(int id)
+        {
+            var @event = await _context.Events.FindAsync(id);
+            if (@event == null) return NotFound();
+            _context.Events.Remove(@event);
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
 
         [HttpGet("{id}/stats")]

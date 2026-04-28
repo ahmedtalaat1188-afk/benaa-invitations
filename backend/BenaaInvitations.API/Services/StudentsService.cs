@@ -10,6 +10,8 @@ namespace BenaaInvitations.API.Services
         Task<List<string>> GetGradesAsync();
         Task<List<string>> GetSectionsAsync();
         Task AddStudentsAsync(List<Student> students);
+        Task UpdateStudentAsync(string nationalId, Student student);
+        Task DeleteStudentAsync(string nationalId);
     }
 
     public class StudentsService : IStudentsService
@@ -64,6 +66,36 @@ namespace BenaaInvitations.API.Services
             }
             _context.Students.AddRange(students);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateStudentAsync(string nationalId, Student student)
+        {
+            var existing = await _context.Students.FirstOrDefaultAsync(s => s.NationalId == nationalId);
+            if (existing != null)
+            {
+                existing.NameAr = student.NameAr ?? existing.NameAr;
+                existing.NameEn = student.NameEn ?? existing.NameEn;
+                existing.Name = student.Name ?? existing.Name;
+                existing.Email = student.Email ?? existing.Email;
+                existing.Phone = student.Phone ?? existing.Phone;
+                existing.ParentName = student.ParentName ?? existing.ParentName;
+                existing.Grade = student.Grade ?? existing.Grade;
+                existing.EducationLevel = student.EducationLevel ?? existing.EducationLevel;
+                existing.Section = student.Section ?? existing.Section;
+                existing.AcademicYear = student.AcademicYear ?? existing.AcademicYear;
+                
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteStudentAsync(string nationalId)
+        {
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.NationalId == nationalId);
+            if (student != null)
+            {
+                _context.Students.Remove(student);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

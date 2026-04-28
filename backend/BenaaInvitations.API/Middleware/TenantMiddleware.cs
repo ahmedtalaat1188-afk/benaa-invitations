@@ -38,6 +38,18 @@ namespace BenaaInvitations.API.Middleware
                         tenantService.SchoolId = school.Id;
                         tenantService.Subdomain = subdomain;
                     }
+                    else
+                    {
+                        // Fallback to default school for single-tenant deployment
+                        tenantService.SchoolId = 1;
+                        tenantService.Subdomain = "ahsa-model";
+                    }
+                }
+                else
+                {
+                    // Fallback if no subdomain at all
+                    tenantService.SchoolId = 1;
+                    tenantService.Subdomain = "ahsa-model";
                 }
             }
 

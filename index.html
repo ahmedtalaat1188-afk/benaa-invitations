@@ -254,6 +254,23 @@
     </div>
 </div>
 
+<!-- 📱 MODAL: EDIT STUDENT -->
+<div id="modal-edit-student" class="modal-overlay" onclick="this.style.display='none'">
+    <div class="modal fade-in" style="max-width: 500px;" onclick="event.stopPropagation()">
+        <h2 style="font-weight: 900; margin-bottom: 2rem;">✏️ تعديل بيانات الطالب</h2>
+        <input type="hidden" id="edit-stu-id">
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div><label style="display: block; margin-bottom: 8px; font-weight: 700;">اسم الطالب</label><input type="text" id="edit-stu-name" style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid #ddd;"></div>
+            <div><label style="display: block; margin-bottom: 8px; font-weight: 700;">رقم التواصل</label><input type="text" id="edit-stu-phone" style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid #ddd;"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div><label style="display: block; margin-bottom: 8px; font-weight: 700;">الصف الدراسي</label><input type="text" id="edit-stu-grade" style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid #ddd;"></div>
+                <div><label style="display: block; margin-bottom: 8px; font-weight: 700;">القسم</label><input type="text" id="edit-stu-section" style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid #ddd;"></div>
+            </div>
+            <button class="btn btn-primary" style="padding: 1.5rem; justify-content: center; font-size: 1.1rem; margin-top: 1rem;" onclick="processEditStudent()">💾 حفظ التعديلات</button>
+        </div>
+    </div>
+</div>
+
 <!-- 📦 APP SHELL -->
 <div id="app-shell" class="app-shell">
     <aside class="sidebar">
@@ -534,6 +551,23 @@
             </div>
             <div><label data-i18n="label_ev_loc" style="display: block; margin-bottom: 8px; font-weight: 700;">المكان / القاعة</label><input type="text" id="ev-loc" style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid #ddd;" placeholder="مثلاً: قاعة المدرسة الكبرى"></div>
             <button class="btn btn-primary" style="padding: 1.5rem; justify-content: center; font-size: 1.1rem; margin-top: 1rem;" onclick="saveNewEvent()" data-i18n="btn_create_event_now">🚀 إنشاء الفعالية الآن</button>
+        </div>
+    </div>
+</div>
+
+<!-- 📱 MODAL: EDIT EVENT -->
+<div id="modal-edit-event" class="modal-overlay" onclick="this.style.display='none'">
+    <div class="modal fade-in" style="max-width: 500px;" onclick="event.stopPropagation()">
+        <h2 style="font-weight: 900; margin-bottom: 2rem;">✏️ تعديل الفعالية</h2>
+        <input type="hidden" id="edit-ev-id">
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div><label style="display: block; margin-bottom: 8px; font-weight: 700;">اسم الفعالية</label><input type="text" id="edit-ev-name" style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid #ddd;"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div><label style="display: block; margin-bottom: 8px; font-weight: 700;">التاريخ</label><input type="date" id="edit-ev-date" style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid #ddd;"></div>
+                <div><label style="display: block; margin-bottom: 8px; font-weight: 700;">الوقت</label><input type="time" id="edit-ev-time" style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid #ddd;"></div>
+            </div>
+            <div><label style="display: block; margin-bottom: 8px; font-weight: 700;">المكان / القاعة</label><input type="text" id="edit-ev-loc" style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid #ddd;"></div>
+            <button class="btn btn-primary" style="padding: 1.5rem; justify-content: center; font-size: 1.1rem; margin-top: 1rem;" onclick="processEditEvent()">💾 حفظ التعديلات</button>
         </div>
     </div>
 </div>
@@ -1075,7 +1109,11 @@
                         <h3 style="font-size: 1.5rem; font-weight: 900;">👑 ${ev.title}</h3>
                         <p style="color: #64748b; margin-top: 5px;">📅 ${formattedDate} (${ev.time || '--:--'}) | 📍 ${ev.locationLabel || 'القاعة الرئيسية'} | 👥 ${ev.guests?.length || 0} مدعو</p>
                     </div>
-                    <button class="btn btn-primary" onclick="openGuestList('${ev.title}', ${ev.id})">إدارة المدعوين →</button>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-outline" style="border:1px solid #eab308; color:#eab308;" onclick="openEditEvent(${ev.id}, '${ev.title.replace(/'/g, "\\'")}', '${ev.date || ''}', '${ev.time || ''}', '${ev.locationLabel?.replace(/'/g, "\\'") || ''}')">✏️ تعديل</button>
+                        <button class="btn btn-outline" style="border:1px solid #ef4444; color:#ef4444;" onclick="deleteEvent(${ev.id})">🗑️ حذف</button>
+                        <button class="btn btn-primary" onclick="openGuestList('${ev.title.replace(/'/g, "\\'")}', ${ev.id})">إدارة المدعوين →</button>
+                    </div>
                 `;
                 container.appendChild(div);
 
@@ -1178,6 +1216,7 @@
                 console.log("Saving Event:", payload);
                 const res = await fetchWithAuth(`${API_BASE}/Events`, {
                     method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload)
                 });
                 if (res.ok) {
@@ -1197,6 +1236,62 @@
                 showToast(currentLang === 'ar' ? "❌ فشل حفظ الفعالية: " + err.message : "❌ Failed to save event: " + err.message, "error");
             }
             return;
+        }
+    }
+
+    function openEditEvent(id, name, date, time, loc) {
+        document.getElementById('edit-ev-id').value = id;
+        document.getElementById('edit-ev-name').value = name;
+        
+        let formattedDate = "";
+        if (date && date !== "null") {
+            try { formattedDate = new Date(date).toISOString().split('T')[0]; } catch(e) {}
+        }
+        document.getElementById('edit-ev-date').value = formattedDate;
+        
+        document.getElementById('edit-ev-time').value = (time && time !== "null") ? time : "";
+        document.getElementById('edit-ev-loc').value = (loc && loc !== "null") ? loc : "";
+        
+        document.getElementById('modal-edit-event').style.display = 'flex';
+    }
+
+    async function processEditEvent() {
+        const id = document.getElementById('edit-ev-id').value;
+        const name = document.getElementById('edit-ev-name').value;
+        const date = document.getElementById('edit-ev-date').value;
+        const time = document.getElementById('edit-ev-time').value;
+        const loc = document.getElementById('edit-ev-loc').value;
+
+        if (!name) { alert("⚠️ يجب إدخال اسم الفعالية."); return; }
+
+        if (USE_API) {
+            try {
+                const res = await fetchWithAuth(`${API_BASE}/Events/${id}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ title: name, date: date, time: time, locationLabel: loc })
+                });
+                showToast("✅ تم التعديل بنجاح");
+                document.getElementById('modal-edit-event').style.display = 'none';
+                await loadEvents();
+            } catch (err) {
+                console.error(err);
+                showToast("❌ فشل التعديل: " + err.message, "error");
+            }
+        }
+    }
+
+    async function deleteEvent(id) {
+        if (!confirm("⚠️ هل أنت متأكد من حذف هذه الفعالية نهائياً؟")) return;
+        if (USE_API) {
+            try {
+                await fetchWithAuth(`${API_BASE}/Events/${id}`, { method: 'DELETE' });
+                showToast("🗑️ تم الحذف بنجاح");
+                await loadEvents();
+            } catch (err) {
+                console.error(err);
+                showToast("❌ فشل الحذف: " + err.message, "error");
+            }
         }
     }
 
@@ -1303,10 +1398,12 @@
                         <td style="text-align: center;"><input type="checkbox" class="rec-check" style="width: 17px; height: 17px;" onclick="syncRecordBulkBtn()" data-name="${r.name}" data-phone="${r.phone}"></td>
                         <td>${r.name}</td>
                         <td>${r.grade || 'طالب'}</td>
-                        <td>${r.phone}</td>
+                        <td>${r.phone || '--'}</td>
                         <td>${r.section || '--'}</td>
-                        <td style="text-align: center;">
-                            <button class="btn btn-primary" style="padding: 0.4rem 1rem; font-size: 0.75rem;" onclick="addToGuests('${r.name}', '${r.phone}')">➕ ${addLabel}</button>
+                        <td style="text-align: center; display: flex; gap: 5px; justify-content: center;">
+                            <button class="btn btn-outline" style="padding: 0.4rem; padding-bottom: 0.1rem; font-size: 0.9rem; border-color:#eab308; color:#eab308; height: 32px;" title="تعديل" onclick="editStudent('${r.nationalId}', '${r.name?.replace(/'/g, "\\'") || ''}', '${r.phone || ''}', '${r.grade || ''}', '${r.section || ''}')">✏️</button>
+                            <button class="btn btn-outline" style="padding: 0.4rem; padding-bottom: 0.1rem; font-size: 0.9rem; border-color:#ef4444; color:#ef4444; height: 32px;" title="حذف" onclick="deleteStudent('${r.nationalId}')">🗑️</button>
+                            <button class="btn btn-primary" style="padding: 0.4rem 1rem; font-size: 0.75rem; height: 32px;" onclick="addToGuests('${r.name?.replace(/'/g, "\\'")}', '${r.phone}')">➕ ${addLabel}</button>
                         </td>`;
                     body.appendChild(tr);
                 });
@@ -1339,6 +1436,56 @@
             body.appendChild(tr);
         });
         syncRecordBulkBtn();
+        syncRecordBulkBtn();
+    }
+
+    function editStudent(id, name, phone, grade, section) {
+        document.getElementById('edit-stu-id').value = id;
+        document.getElementById('edit-stu-name').value = name;
+        document.getElementById('edit-stu-phone').value = phone;
+        document.getElementById('edit-stu-grade').value = grade;
+        document.getElementById('edit-stu-section').value = section;
+        document.getElementById('modal-edit-student').style.display = 'flex';
+    }
+
+    async function processEditStudent() {
+        const id = document.getElementById('edit-stu-id').value;
+        const name = document.getElementById('edit-stu-name').value;
+        const phone = document.getElementById('edit-stu-phone').value;
+        const grade = document.getElementById('edit-stu-grade').value;
+        const section = document.getElementById('edit-stu-section').value;
+
+        if (!name) { alert("⚠️ يجب إدخال الاسم."); return; }
+
+        if (USE_API) {
+            try {
+                const res = await fetchWithAuth(`${API_BASE}/Students/${id}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ name: name, nameAr: name, phone: phone, grade: grade, section: section })
+                });
+                showToast("✅ تم تعديل بيانات الطالب بنجاح");
+                document.getElementById('modal-edit-student').style.display = 'none';
+                loadData('students'); // Refresh the list
+            } catch (err) {
+                console.error(err);
+                showToast("❌ فشل التعديل: " + err.message, "error");
+            }
+        }
+    }
+
+    async function deleteStudent(id) {
+        if (!confirm("⚠️ هل أنت متأكد من حذف هذا السجل نهائياً؟")) return;
+        if (USE_API) {
+            try {
+                await fetchWithAuth(`${API_BASE}/Students/${id}`, { method: 'DELETE' });
+                showToast("🗑️ تم الحذف بنجاح");
+                loadData('students'); // Refresh the view
+            } catch (err) {
+                console.error(err);
+                showToast("❌ فشل الحذف: " + err.message, "error");
+            }
+        }
     }
 
     function toggleAllRecords(master) {
